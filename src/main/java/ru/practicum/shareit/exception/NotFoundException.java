@@ -1,10 +1,10 @@
 package ru.practicum.shareit.exception;
 
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@NoArgsConstructor
+@AllArgsConstructor
+@Getter
 public class NotFoundException extends RuntimeException {
-    public NotFoundException(String s) {
-        super(s);
-    }
+    String resource;
+    Long resourceId;
 }
