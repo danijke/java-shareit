@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.model;
 
-import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.model.User;
@@ -10,11 +9,8 @@ import ru.practicum.shareit.user.model.User;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Item {
     Long id;
-    @NotBlank
     String name;
-    @NotBlank
     String description;
-    @NotNull
     Boolean available;
     User owner;
 }

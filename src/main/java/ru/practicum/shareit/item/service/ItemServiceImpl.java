@@ -7,7 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repo.ItemRepository;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
@@ -32,18 +32,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto postItem(Long userId, Item newItem) {
-        User user = userService.getUser(userId);
-        newItem.setOwner(user);
-        return ItemMapper.toItemDto(repository.saveItem(newItem));
+    public ItemDto postItem(Long userId, ItemDto dto) {
+        Item item = ItemMapper.toItem(dto, UserMapper.toUser(userService.getUserById(userId)));
+        return ItemMapper.toItemDto(repository.saveItem(item));
     }
 
     @Override
     public ItemDto patchItem(Long userId, ItemDto dto) {
         Item item = getItem(dto.getId());
-        User user = userService.getUser(userId);
-        if (!item.getOwner().equals(user)) {
-            throw new UserPermissionException();
+        if (!item.getOwner().getId().equals(userId)) {
+            throw new UserPermissionException("User has not permission", userId);
         }
         ItemMapper.patch(item, dto);
         repository.updateItem(item);
@@ -65,6 +63,6 @@ public class ItemServiceImpl implements ItemService {
 
     private Item getItem(Long id) {
         return repository.findItem(id)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(Item.class.getSimpleName(), id));
     }
 }

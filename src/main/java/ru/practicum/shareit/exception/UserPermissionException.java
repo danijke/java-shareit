@@ -1,10 +1,10 @@
 package ru.practicum.shareit.exception;
 
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@NoArgsConstructor
+@AllArgsConstructor
+@Getter
 public class UserPermissionException extends RuntimeException {
-    public UserPermissionException(String s) {
-        super(s);
-    }
+    String err;
+    Long userId;
 }

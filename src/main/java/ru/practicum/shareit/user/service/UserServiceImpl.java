@@ -1,9 +1,10 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.*;
-import ru.practicum.shareit.user.dto.UserPatchDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repo.UserRepository;
@@ -12,28 +13,30 @@ import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     @Override
-    public Collection<User> getAllUsers() {
-        return repository.findAll();
+    public Collection<UserDto> getAllUsers() {
+        return repository.findAll().stream()
+                .map(UserMapper::toUserDto)
+                .toList();
+    }
+
+    public UserDto getUserById(Long id) {
+        return UserMapper.toUserDto(getUser(id));
     }
 
     @Override
-    public User getUser(Long id) {
-        return repository.findUser(id)
-                .orElseThrow(NotFoundException::new);
+    public UserDto postUser(UserDto dto) {
+        log.info("dto_user after validating: {}", dto);
+        checkEmailExists(dto.getEmail());
+        return UserMapper.toUserDto(repository.saveUser(UserMapper.toUser(dto)));
     }
 
     @Override
-    public User postUser(User newUser) {
-        checkEmailExists(newUser.getEmail());
-        return repository.saveUser(newUser);
-    }
-
-    @Override
-    public UserPatchDto patchUser(UserPatchDto dto) {
+    public UserDto patchUser(UserDto dto) {
         if (dto.getEmail() != null) checkEmailExists(dto.getEmail());
 
         User user = getUser(dto.getId());
@@ -47,9 +50,14 @@ public class UserServiceImpl implements UserService {
         repository.removeUser(id);
     }
 
+    private User getUser(Long id) {
+        return repository.findUser(id)
+                .orElseThrow(() -> new NotFoundException(User.class.getSimpleName(), id));
+    }
+
     private void checkEmailExists(String email) {
         if (repository.emailExits(email)) {
-            throw new EmailConflictException();
+            throw new EmailConflictException(email);
         }
     }
 }
