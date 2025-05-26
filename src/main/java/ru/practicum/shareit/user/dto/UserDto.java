@@ -8,6 +8,8 @@ import ru.practicum.shareit.validation.*;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
     Long id;

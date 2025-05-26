@@ -2,7 +2,9 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -12,52 +14,65 @@ import ru.practicum.shareit.user.repo.UserRepository;
 import java.util.Collection;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     @Override
-    public Collection<UserDto> getAllUsers() {
-        return repository.findAll().stream()
+    public Collection<UserDto> getUsers(Pageable pageable) {
+        return repository.findAll(pageable).stream()
                 .map(UserMapper::toUserDto)
                 .toList();
     }
 
+    @Override
     public UserDto getUserById(Long id) {
         return UserMapper.toUserDto(getUser(id));
     }
 
     @Override
+    @Transactional
     public UserDto postUser(UserDto dto) {
-        log.info("dto_user after validating: {}", dto);
-        checkEmailExists(dto.getEmail());
-        return UserMapper.toUserDto(repository.saveUser(UserMapper.toUser(dto)));
+        checkEmailExists(dto);
+        return UserMapper.toUserDto(repository.save(UserMapper.toUser(dto)));
     }
 
     @Override
+    @Transactional
     public UserDto patchUser(UserDto dto) {
-        if (dto.getEmail() != null) checkEmailExists(dto.getEmail());
-
+        checkEmailExists(dto);
         User user = getUser(dto.getId());
         UserMapper.patch(user, dto);
-        repository.updateUser(user);
-        return dto;
+        return UserMapper.toUserDto(repository.save(user));
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
-        repository.removeUser(id);
+        repository.deleteById(id);
+    }
+
+    @Override
+    public void checkUserExists(Long userId) {
+        if (!repository.existsById(userId)) {
+            throw new NotFoundException(User.class.getSimpleName(), userId);
+        }
     }
 
     private User getUser(Long id) {
-        return repository.findUser(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(User.class.getSimpleName(), id));
     }
 
-    private void checkEmailExists(String email) {
-        if (repository.emailExits(email)) {
-            throw new EmailConflictException(email);
-        }
+    private void checkEmailExists(UserDto dto) {
+        repository.findByEmail(dto.getEmail())
+                .ifPresent(existingUser -> {
+                    if (dto.getId() == null || !existingUser.getId().equals(dto.getId())) {
+                        log.info("Email conflict for dto: {}", dto);
+                        throw new EmailConflictException(dto.getEmail());
+                    }
+                });
     }
 }

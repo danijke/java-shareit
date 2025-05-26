@@ -7,7 +7,7 @@ import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.*;
 
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -40,7 +40,7 @@ public class ErrorHandler {
         return buildError(
                 HttpStatus.FORBIDDEN,
                 "Access Denied",
-                e.getErr(),
+                String.format("%s; UserId: %d", e.getErr(), e.getUserId()),
                 request
         );
     }
@@ -48,9 +48,12 @@ public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidation(MethodArgumentNotValidException e, HttpServletRequest request) {
-        String detail = e.getFieldErrors().stream()
-                .map(err -> String.format("%s: %s", err.getField(), err.getDefaultMessage()))
-                .collect(Collectors.joining("; "));
+        String detail = Stream.concat(
+                e.getFieldErrors().stream()
+                        .map(err -> String.format("%s: %s", err.getField(), err.getDefaultMessage())),
+                e.getGlobalErrors().stream()
+                        .map(err -> String.format("%s: %s", err.getCode(), err.getDefaultMessage()))
+        ).collect(Collectors.joining("; "));
         return buildError(
                 HttpStatus.BAD_REQUEST,
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -73,9 +76,9 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler(ServletRequestBindingException.class)
+    @ExceptionHandler({ServletRequestBindingException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequest(ServletRequestBindingException e, HttpServletRequest request) {
+    public ErrorResponse handleBadRequest(Exception e, HttpServletRequest request) {
         return buildError(
                 HttpStatus.BAD_REQUEST,
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
