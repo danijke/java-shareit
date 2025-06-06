@@ -3,7 +3,7 @@ spring:
     log-startup-info: off
     banner-mode: off
   datasource:
-    url: jdbc:postgresql://localhost:5432/later
+    url: jdbc:postgresql://localhost:5432/shareit
     username: dbuser
     password: 12345
     driver-class-name: org.postgresql.Driver
