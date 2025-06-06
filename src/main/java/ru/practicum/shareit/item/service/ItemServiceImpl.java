@@ -101,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
 
         BooleanExpression predicate = booking.item.id.eq(id)
                 .and(booking.booker.id.eq(userId))
-                .and(booking.end.lt(LocalDateTime.now()))
+                .and(booking.end.before(LocalDateTime.now()))
                 .and(booking.status.eq(BookingStatus.APPROVED));
 
         if (!bookingRepository.exists(predicate)) {

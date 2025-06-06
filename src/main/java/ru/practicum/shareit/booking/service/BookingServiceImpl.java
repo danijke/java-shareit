@@ -71,6 +71,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto patchBooking(Long id, Long userId, Boolean approved) {
         Booking booking = repository.findById(id)
                 .map(b -> {
