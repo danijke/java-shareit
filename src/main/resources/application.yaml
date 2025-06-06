@@ -3,10 +3,10 @@ spring:
     log-startup-info: off
     banner-mode: off
   datasource:
-    url: jdbc:h2:file:./db/filmorate
-    username: sa
-    password: password
-    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/later
+    username: dbuser
+    password: 12345
+    driver-class-name: org.postgresql.Driver
   sql:
     init:
       mode: always
