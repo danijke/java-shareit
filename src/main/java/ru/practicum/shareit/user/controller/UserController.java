@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -16,8 +17,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Collection<UserDto> getUsers() {
-        return userService.getAllUsers();
+    public Collection<UserDto> getUsers(Pageable pageable) {
+        return userService.getUsers(pageable);
     }
 
     @GetMapping("/{id}")
