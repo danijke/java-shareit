@@ -43,7 +43,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public Mono<Void> deleteUser(@PathVariable Long id) {
-        client.deleteUser(id);
+        return client.deleteUser(id);
     }
 
 }

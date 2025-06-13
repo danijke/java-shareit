@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.client;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.*;
 import ru.practicum.shareit.client.BaseWebClient;
@@ -8,22 +9,22 @@ import ru.practicum.shareit.user.dto.UserDto;
 import java.awt.print.Pageable;
 import java.util.Collection;
 
-
-public class UserClient extends BaseWebClient {
-
+@Component
+public class UserClient extends BaseWebClient<UserDto> {
     private static final String PATH = "/users";
 
+    private static final String PATH_WITH_VARS = PATH + "/{id}";
+
     public UserClient(WebClient webClient) {
-        super(webClient);
+        super(webClient, UserDto.class);
     }
 
-
     public Flux<UserDto> getUsers(Pageable pageable) {
-        return getFlux(PATH, UserDto.class, pageable);
+        return getFlux(PATH, pageable);
     }
 
     public Mono<UserDto> getUserById(Long id) {
-        return get(PATH + "/{id}", UserDto.class, id);
+        return get(PATH_WITH_VARS, id);
     }
 
     public Mono<UserDto> postUser(UserDto dto) {
@@ -31,10 +32,10 @@ public class UserClient extends BaseWebClient {
     }
 
     public Mono<UserDto> patchUser(UserDto dto) {
-        return patch(PATH + "/{id}", dto, UserDto.class, dto.getId());
+        return patch(PATH_WITH_VARS, dto, dto.getId());
     }
 
     public Mono<Void> deleteUser(Long id) {
-        return delete(PATH + "/{id}", id);
+        return delete(PATH_WITH_VARS, id);
     }
 }

@@ -4,13 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.*;
 import reactor.core.publisher.*;
+import ru.practicum.shareit.error.ErrorResponse;
+import ru.practicum.shareit.exception.ForwardedServerException;
+
+import java.util.Map;
 
 @RequiredArgsConstructor
-public abstract class BaseWebClient {
+public abstract class BaseWebClient<R> {
 
     protected final WebClient webClient;
 
-    protected <T> Mono<T> get(String uri, Class<T> responseType, Object... uriVariables) {
+    private final Class<R> responseType;
+
+    protected Mono<R> get(String uri, Object... uriVariables) {
         return webClient.get()
                 .uri(uri, uriVariables)
                 .retrieve()
@@ -18,7 +24,7 @@ public abstract class BaseWebClient {
                 .bodyToMono(responseType);
     }
 
-    protected <T> Flux<T> getFlux(String uri, Class<T> responseType, Object... uriVariables) {
+    protected Flux<R> getFlux(String uri, Object... uriVariables) {
         return webClient.get()
                 .uri(uri, uriVariables)
                 .retrieve()
@@ -26,16 +32,37 @@ public abstract class BaseWebClient {
                 .bodyToFlux(responseType);
     }
 
-    protected <T, R> Mono<R> post(String uri, T body, Class<R> responseType) {
+    protected Flux<R> getFluxWithHeader(String uri, Long userId, Object... uriVariables) {
+        return webClient.get()
+                .uri(uri, uriVariables)
+                .header("X-Sharer-User-Id", String.valueOf(userId))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handleServerError)
+                .bodyToFlux(responseType);
+    }
+
+    protected Flux<R> getFluxWithParams(String uri, Map<String, String> queryParams) {
+        return webClient.get()
+                .uri(uriBuilder -> {
+                    var builder = uriBuilder.path(uri);
+                    queryParams.forEach(builder::queryParam);
+                    return builder.build();
+                })
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handleServerError)
+                .bodyToFlux(responseType);
+    }
+
+    protected <T, Type> Mono<Type> post(String uri, T body, Class<Type> type, Object... uriVariables) {
         return webClient.post()
-                .uri(uri)
+                .uri(uri, uriVariables)
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::handleServerError)
-                .bodyToMono(responseType);
+                .bodyToMono(type);
     }
 
-    protected <T, R> Mono<R> patch(String uri, T body, Class<R> responseType, Object... uriVariables) {
+    protected <T> Mono<R> patch(String uri, T body, Object... uriVariables) {
         return webClient.patch()
                 .uri(uri, uriVariables)
                 .bodyValue(body)
@@ -53,8 +80,8 @@ public abstract class BaseWebClient {
     }
 
     private Mono<? extends Throwable> handleServerError(ClientResponse response) {
-        return response.bodyToMono(String.class)
-                .flatMap(body -> Mono.error(new RuntimeException(body)));
+        return response.bodyToMono(ErrorResponse.class)
+                .flatMap(error -> Mono.error(new ForwardedServerException(error)));
     }
 }
 

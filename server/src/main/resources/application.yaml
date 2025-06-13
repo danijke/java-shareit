@@ -4,13 +4,10 @@ spring:
   main:
     log-startup-info: off
     banner-mode: off
-  config:
-    activate:
-      on-profile: default
   datasource:
     url: jdbc:postgresql://localhost:5432/shareit
-    username: shareit
-    password: shareit
+    username: danijke
+    password: 68356835
     driver-class-name: org.postgresql.Driver
   sql:
     init:
