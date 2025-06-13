@@ -64,10 +64,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto patchItem(Long userId, ItemDto dto) {
+    public ItemDto patchItem(ItemDto dto) {
         Item item = getItem(dto.getId());
-        if (!item.getOwner().getId().equals(userId)) {
-            throw new UserPermissionException("User has not permission", userId);
+        if (!item.getOwner().getId().equals(dto.getOwnerId())) {
+            throw new UserPermissionException("User has not permission", dto.getOwnerId());
         }
         ItemMapper.patch(item, dto);
         return ItemMapper.toItemDto(repository.save(item));
@@ -93,22 +93,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public CommentDto postComment(CommentDto dto, Long id, Long userId) {
-        Item item = getItem(id);
-        UserDto userDto = userService.getUserById(userId);
+    public CommentDto postComment(CommentRequestDto dto) {
+        Item item = getItem(dto.getItemId());
+        UserDto userDto = userService.getUserById(dto.getBookerId());
 
         QBooking booking = QBooking.booking;
 
-        BooleanExpression predicate = booking.item.id.eq(id)
-                .and(booking.booker.id.eq(userId))
+        BooleanExpression predicate = booking.item.id.eq(dto.getItemId())
+                .and(booking.booker.id.eq(dto.getBookerId()))
                 .and(booking.end.before(LocalDateTime.now()))
                 .and(booking.status.eq(BookingStatus.APPROVED));
 
         if (!bookingRepository.exists(predicate)) {
-            throw new ValidationException(String.format("Item not available for comment; ItemId: %d", id));
+            throw new ValidationException(String.format("Item not available for comment; ItemId: %d", dto.getItemId()));
         }
 
-        Comment saved = commentRepository.save(CommentMapper.toComment(dto, item, UserMapper.toUser(userDto)));
+        Comment saved = commentRepository.save(CommentMapper.toComment(dto.getText(), item, UserMapper.toUser(userDto)));
 
         return CommentMapper.toCommentDto(saved);
     }

@@ -1,15 +1,11 @@
 package ru.practicum.shareit.booking.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.*;
 import ru.practicum.shareit.booking.client.BookingClient;
 import ru.practicum.shareit.booking.dto.*;
-import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.client.ItemClient;
-
-import java.util.Collection;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +22,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public Collection<BookingDto> getAllByOwner(
+    public Flux<BookingDto> getAllByOwner(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") String state
     ) {
@@ -34,7 +30,7 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    public BookingDto getByUserId(
+    public Mono<BookingDto> getByUserId(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long id
     ) {
@@ -42,20 +38,26 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingDto createBooking(
+    public Mono<BookingDto> createBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestBody BookingRequestDto dto
+            @Valid @RequestBody BookingRequestDto dto
     ) {
-        dto.setBookerId(userId);
+        dto.setUserId(userId);
         return client.postBooking(dto);
     }
 
     @PatchMapping("/{id}")
-    public BookingDto patchBooking(
+    public Mono<BookingDto> patchBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long id,
             @RequestParam Boolean approved
     ) {
-        return client.patchBooking(id, userId, approved);
+        BookingRequestDto dto = BookingRequestDto.builder()
+                .id(id)
+                .userId(userId)
+                .status(approved)
+                .build();
+
+        return client.patchBooking(dto);
     }
 }

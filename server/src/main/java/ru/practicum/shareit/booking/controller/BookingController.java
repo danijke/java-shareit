@@ -40,18 +40,17 @@ public class BookingController {
 
     @PostMapping
     public BookingDto createBooking(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestBody BookingRequestDto dto
     ) {
-        return bookingService.postBooking(userId, dto);
+        return bookingService.postBooking(dto);
     }
 
     @PatchMapping("/{id}")
     public BookingDto patchBooking(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long id,
-            @RequestParam Boolean approved
+            @RequestBody BookingRequestDto dto
     ) {
-        return bookingService.patchBooking(id, userId, approved);
+        dto.setId(id);
+        return bookingService.patchBooking(dto);
     }
 }

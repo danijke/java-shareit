@@ -24,6 +24,15 @@ public abstract class BaseWebClient<R> {
                 .bodyToMono(responseType);
     }
 
+    protected Mono<R> getMonoWithHeader(String uri, Long userId, Object... uriVariables) {
+        return webClient.get()
+                .uri(uri, uriVariables)
+                .header("X-Sharer-User-Id", String.valueOf(userId))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handleServerError)
+                .bodyToMono(responseType);
+    }
+
     protected Flux<R> getFlux(String uri, Object... uriVariables) {
         return webClient.get()
                 .uri(uri, uriVariables)
@@ -53,6 +62,19 @@ public abstract class BaseWebClient<R> {
                 .bodyToFlux(responseType);
     }
 
+    protected Flux<R> getFluxWithHeaderAndParams(String uri, Long userId, Map<String, String> queryParams) {
+        return webClient.get()
+                .uri(uriBuilder -> {
+                    var builder = uriBuilder.path(uri);
+                    queryParams.forEach(builder::queryParam);
+                    return builder.build();
+                })
+                .header("X-Sharer-User-Id", String.valueOf(userId))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handleServerError)
+                .bodyToFlux(responseType);
+    }
+
     protected <T, Type> Mono<Type> post(String uri, T body, Class<Type> type, Object... uriVariables) {
         return webClient.post()
                 .uri(uri, uriVariables)
@@ -60,6 +82,15 @@ public abstract class BaseWebClient<R> {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::handleServerError)
                 .bodyToMono(type);
+    }
+
+    protected <T> Mono<R> post(String uri, T body,  Object... uriVariables) {
+        return webClient.post()
+                .uri(uri, uriVariables)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handleServerError)
+                .bodyToMono(responseType);
     }
 
     protected <T> Mono<R> patch(String uri, T body, Object... uriVariables) {

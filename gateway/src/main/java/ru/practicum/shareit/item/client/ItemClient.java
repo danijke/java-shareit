@@ -13,8 +13,9 @@ public class ItemClient extends BaseWebClient<ItemDto> {
     private static final String PATH = "/items";
 
     private static final String PATH_WITH_VARS = PATH + "/{id}";
-    public ItemClient(WebClient webClient, Class<ItemDto> responseType) {
-        super(webClient, responseType);
+
+    public ItemClient(WebClient webClient) {
+        super(webClient, ItemDto.class);
     }
 
     public Flux<ItemDto> getItemsByUser(Long userId) {
@@ -26,7 +27,7 @@ public class ItemClient extends BaseWebClient<ItemDto> {
     }
 
     public Mono<ItemDto> postItem(ItemDto dto) {
-        return post(PATH, dto, ItemDto.class);
+        return post(PATH, dto);
     }
 
     public Mono<ItemDto> patchItem(ItemDto dto) {
@@ -39,7 +40,7 @@ public class ItemClient extends BaseWebClient<ItemDto> {
 
 
     public Mono<CommentDto> postComment(CommentRequestDto requestDto) {
-        return post(PATH_WITH_VARS, requestDto, CommentDto.class,requestDto.getItemId());
+        return post(PATH_WITH_VARS + "/comment", requestDto, CommentDto.class, requestDto.getItemId());
     }
 
     public Flux<ItemDto> searchByText(String text) {

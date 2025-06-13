@@ -58,7 +58,7 @@ public class ItemController {
             @RequestBody CommentDto dto
     ) {
         CommentRequestDto requestDto = CommentRequestDto.builder()
-                .dto(dto)
+                .text(dto.getText())
                 .itemId(id)
                 .bookerId(userId)
                 .build();

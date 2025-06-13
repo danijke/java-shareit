@@ -27,22 +27,17 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestBody ItemDto dto
-    ) {
-        dto.setOwnerId(userId);
+    public ItemDto createItem(@RequestBody ItemDto dto) {
         return itemService.postItem(dto);
     }
 
     @PatchMapping("/{id}")
     public ItemDto patchItem(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long id,
             @RequestBody ItemDto dto
     ) {
         dto.setId(id);
-        return itemService.patchItem(userId, dto);
+        return itemService.patchItem(dto);
     }
 
     @DeleteMapping("/{id}")
@@ -52,11 +47,11 @@ public class ItemController {
 
     @PostMapping("/{id}/comment")
     public CommentDto postComment(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long id,
-            @RequestBody CommentDto dto
+            @RequestBody CommentRequestDto dto
     ) {
-        return itemService.postComment(dto, id, userId);
+        dto.setItemId(id);
+        return itemService.postComment(dto);
     }
 
     @GetMapping("/search")

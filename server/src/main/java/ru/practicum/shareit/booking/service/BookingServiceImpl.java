@@ -33,8 +33,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto postBooking(Long userId, BookingRequestDto dto) {
-        User booker = UserMapper.toUser(userService.getUserById(userId));
+    public BookingDto postBooking(BookingRequestDto dto) {
+        User booker = UserMapper.toUser(userService.getUserById(dto.getUserId()));
         ItemDto item = itemService.getItemById(dto.getItemId());
 
         if (!item.getAvailable()) {
@@ -72,18 +72,18 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto patchBooking(Long id, Long userId, Boolean approved) {
-        Booking booking = repository.findById(id)
+    public BookingDto patchBooking(BookingRequestDto dto) {
+        Booking booking = repository.findById(dto.getId())
                 .map(b -> {
-                    if (!b.getItem().getOwner().getId().equals(userId)) {
-                        throw new UserPermissionException("User is not owner", userId);
+                    if (!b.getItem().getOwner().getId().equals(dto.getUserId())) {
+                        throw new UserPermissionException("User is not owner", dto.getUserId());
                     }
 
-                    BookingStatus newStatus = approved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
+                    BookingStatus newStatus = dto.getStatus() ? BookingStatus.APPROVED : BookingStatus.REJECTED;
                     b.setStatus(newStatus);
                     return b;
                 })
-                .orElseThrow(() -> new NotFoundException(Booking.class.getSimpleName(), id));
+                .orElseThrow(() -> new NotFoundException(Booking.class.getSimpleName(), dto.getId()));
         return BookingMapper.toBookingDto(booking);
     }
 

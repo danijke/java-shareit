@@ -1,16 +1,20 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.request.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentDto {
+public class ItemRequestDto {
     Long id;
-    String text;
-    String authorName;
+
+    String description;
+
     LocalDateTime created;
+
+    List<ShortItemDto> items;
 }

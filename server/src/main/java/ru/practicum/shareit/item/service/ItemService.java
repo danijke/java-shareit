@@ -11,11 +11,11 @@ public interface ItemService {
 
     ItemDto postItem(ItemDto dto);
 
-    ItemDto patchItem(Long userId, ItemDto dto);
+    ItemDto patchItem(ItemDto dto);
 
     void deleteItem(Long id);
 
     Collection<ItemDto> searchByText(String text);
 
-    CommentDto postComment(CommentDto dto, Long id, Long userId);
+    CommentDto postComment(CommentRequestDto dto);
 }
