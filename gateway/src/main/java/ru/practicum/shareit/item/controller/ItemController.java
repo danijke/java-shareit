@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.*;
@@ -8,6 +9,7 @@ import ru.practicum.shareit.item.client.ItemClient;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.validation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/items")
@@ -32,6 +34,7 @@ public class ItemController {
             @Validated(OnPost.class) @RequestBody ItemDto dto
     ) {
         dto.setOwnerId(userId);
+        log.info("dto in controller {}", dto);
         return client.postItem(dto);
     }
 

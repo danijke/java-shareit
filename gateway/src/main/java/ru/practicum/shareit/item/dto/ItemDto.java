@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -30,6 +31,8 @@ public class ItemDto {
     BookingDto nextBooking;
 
     List<CommentDto> comments;
+
+    Long requestId;
 
     Long ownerId;
 }

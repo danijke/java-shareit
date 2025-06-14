@@ -6,6 +6,8 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.Collection;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
+
+    @EntityGraph(attributePaths = "items")
     Collection<Item> findAllByOwnerId(Long userId);
 
     @Query("select i from Item i " +

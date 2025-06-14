@@ -6,9 +6,6 @@ import reactor.core.publisher.*;
 import ru.practicum.shareit.client.BaseWebClient;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import java.awt.print.Pageable;
-import java.util.Collection;
-
 @Component
 public class UserClient extends BaseWebClient<UserDto> {
     private static final String PATH = "/users";
@@ -19,8 +16,8 @@ public class UserClient extends BaseWebClient<UserDto> {
         super(webClient, UserDto.class);
     }
 
-    public Flux<UserDto> getUsers(Pageable pageable) {
-        return getFlux(PATH, pageable);
+    public Flux<UserDto> getUsers() {
+        return getFlux(PATH);
     }
 
     public Mono<UserDto> getUserById(Long id) {

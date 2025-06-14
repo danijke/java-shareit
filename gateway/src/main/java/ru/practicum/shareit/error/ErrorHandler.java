@@ -15,7 +15,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(Throwable.class)
-    public Mono<ResponseEntity<ErrorResponse>> handleValidation(Throwable  e, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<ErrorResponse>> handleValidation(Throwable e, ServerWebExchange exchange) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse body = ErrorResponse.builder()
                 .status(status.value())

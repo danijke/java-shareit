@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.*;
@@ -8,18 +9,16 @@ import ru.practicum.shareit.user.client.UserClient;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.validation.*;
 
-import java.awt.print.Pageable;
-import java.util.Collection;
-
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 public class UserController {
     private final UserClient client;
 
     @GetMapping
-    public Flux<UserDto> getUsers(Pageable pageable) {
-        return client.getUsers(pageable);
+    public Flux<UserDto> getUsers() {
+        return client.getUsers();
     }
 
     @GetMapping("/{id}")
@@ -29,6 +28,7 @@ public class UserController {
 
     @PostMapping
     public Mono<UserDto> create(@Validated(OnPost.class) @RequestBody UserDto dto) {
+        log.info("user dto in controller {}", dto);
         return client.postUser(dto);
     }
 

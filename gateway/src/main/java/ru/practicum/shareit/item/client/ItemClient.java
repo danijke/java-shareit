@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.*;
@@ -23,7 +24,7 @@ public class ItemClient extends BaseWebClient<ItemDto> {
     }
 
     public Mono<ItemDto> getItemById(Long id) {
-        return get(PATH_WITH_VARS,id);
+        return get(PATH_WITH_VARS, id);
     }
 
     public Mono<ItemDto> postItem(ItemDto dto) {
@@ -35,7 +36,7 @@ public class ItemClient extends BaseWebClient<ItemDto> {
     }
 
     public Mono<Void> deleteItem(Long id) {
-        return delete(PATH_WITH_VARS,id);
+        return delete(PATH_WITH_VARS, id);
     }
 
 

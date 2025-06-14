@@ -84,7 +84,7 @@ public abstract class BaseWebClient<R> {
                 .bodyToMono(type);
     }
 
-    protected <T> Mono<R> post(String uri, T body,  Object... uriVariables) {
+    protected <T> Mono<R> post(String uri, T body, Object... uriVariables) {
         return webClient.post()
                 .uri(uri, uriVariables)
                 .bodyValue(body)
