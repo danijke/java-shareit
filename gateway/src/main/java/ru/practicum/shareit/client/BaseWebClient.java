@@ -75,7 +75,7 @@ public abstract class BaseWebClient<R> {
                 .bodyToFlux(responseType);
     }
 
-    protected <T, Type> Mono<Type> post(String uri, T body, Class<Type> type, Object... uriVariables) {
+    protected <T, B> Mono<B> post(String uri, T body, Class<B> type, Object... uriVariables) {
         return webClient.post()
                 .uri(uri, uriVariables)
                 .bodyValue(body)
