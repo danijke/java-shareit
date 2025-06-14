@@ -1,0 +1,9 @@
+shareit:
+  server:
+    url: http://localhost:9090
+server:
+  port: 8080
+logging:
+  level:
+    root: INFO
+    ru.practicum: TRACE
