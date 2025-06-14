@@ -17,7 +17,6 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDto postRequest(@RequestBody ItemRequestDto dto) {
-        log.info("request dto in server-controller {}", dto);
         return service.postRequest(dto);
     }
 

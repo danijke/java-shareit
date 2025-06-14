@@ -33,7 +33,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public Collection<ItemRequestDto> getAllByUserId(Long userId) {
         return repository.findAllByRequesterIdWithItems(userId).stream()
-                .peek(itemRequest -> log.info("items after query: {}", itemRequest.getItems()))
                 .map(ItemRequestMapper::toItemRequestDto)
                 .toList();
     }

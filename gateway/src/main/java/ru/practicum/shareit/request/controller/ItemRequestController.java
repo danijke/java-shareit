@@ -20,7 +20,6 @@ public class ItemRequestController {
             @RequestBody ItemRequestDto dto
     ) {
         dto.setUserId(userId);
-        log.info("request dto in controller {}", dto);
         return client.postRequest(dto);
     }
 

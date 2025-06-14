@@ -34,7 +34,6 @@ public class ItemController {
             @Validated(OnPost.class) @RequestBody ItemDto dto
     ) {
         dto.setOwnerId(userId);
-        log.info("dto in controller {}", dto);
         return client.postItem(dto);
     }
 

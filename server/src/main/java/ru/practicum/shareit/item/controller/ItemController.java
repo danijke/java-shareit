@@ -29,7 +29,6 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestBody ItemDto dto) {
-        log.info("dto in controller {}", dto);
         return itemService.postItem(dto);
     }
 

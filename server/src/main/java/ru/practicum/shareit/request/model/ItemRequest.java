@@ -29,8 +29,10 @@ public class ItemRequest {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
+    @ToString.Exclude
     private User requester;
 
     @OneToMany(mappedBy = "request")
+    @ToString.Exclude
     private List<Item> items;
 }
